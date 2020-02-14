@@ -1,4 +1,4 @@
-# EmpaLink Sample Project
+# E4link 1.0 Sample Project
 
 ## Introduction
 
@@ -6,7 +6,7 @@ This sample project gives you the boilerplate code you need to connect to an Emp
 
 The sample application implemented in the project has very simple functionalities:
 
-- It initializes the EmpaLink library with your API key.
+- It initializes the E4link library with your API key.
 - If the previous step is successful, it starts scanning for Empatica devices, till it finds one that can be used with the API key you inserted in the code.
 - When such a device has been found, the app connects to the devices and streams data for 10 seconds, then it disconnects.
 
@@ -16,7 +16,7 @@ The sample application implemented in the project has very simple functionalitie
 - Open the sample project in Android Studio.
 - Make sure you have a valid API key. You can request one for your Empatica Connect account from our [Developer Area][1].
 - Edit `MainActivity.java` and assign your API key to the `EMPATICA_API_KEY` constant .
-- Download the Android SDK from our [Developer Area][1].
+- Download the Android E4 link 1.0 or newer SDK from our [Developer Area][1].
 - Unzip the archive you've downloaded and copy the `.aar` file you'll find inside into the `libs` folder contained in the sample project.
 - Build and run the project.
 - If a device is in range and its light is blinking green, but the app doesn't connect, please check that the discovered device can be used with your API key. If the `allowed` parameter is always false, the device is not linked to your API key. Please check your [Developer Area][1].
