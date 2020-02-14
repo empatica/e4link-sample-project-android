@@ -1,0 +1,49 @@
+# Local configuration file
+local.properties
+
+# Java class files
+*.class
+
+# Built native files
+*.o
+*.so
+obj/
+
+# Built application files
+*.apk
+*.ap_
+
+# Generated files
+bin/
+gen/
+
+# Gradle files
+.gradle/
+build/
+
+# IntelliJ Idea
+.idea/
+*.iml
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Proguard folder
+proguard/
+
+# Log Files
+*.log
+
+# EmpaLink/E4link lib
+empalink*.aar
+E4link*.aar
+
+gradlew*
+gradle/*
+docs
