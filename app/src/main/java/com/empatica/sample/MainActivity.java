@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.le.ScanCallback;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -233,7 +234,28 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
 
     @Override
     public void didFailedScanning(int errorCode) {
-
+        
+        /*
+         A system error occurred while scanning.
+         @see https://developer.android.com/reference/android/bluetooth/le/ScanCallback
+        */
+        switch (errorCode) {
+            case ScanCallback.SCAN_FAILED_ALREADY_STARTED:
+                Log.e(TAG,"Scan failed: a BLE scan with the same settings is already started by the app");
+                break;
+            case ScanCallback.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED:
+                Log.e(TAG,"Scan failed: app cannot be registered");
+                break;
+            case ScanCallback.SCAN_FAILED_FEATURE_UNSUPPORTED:
+                Log.e(TAG,"Scan failed: power optimized scan feature is not supported");
+                break;
+            case ScanCallback.SCAN_FAILED_INTERNAL_ERROR:
+                Log.e(TAG,"Scan failed: internal error");
+                break;
+            default:
+                Log.e(TAG,"Scan failed with unknown error (errorCode=" + errorCode + ")");
+                break;
+        }
     }
 
     @Override
@@ -245,7 +267,10 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
 
     @Override
     public void bluetoothStateChanged() {
-
+        // E4link detected a bluetooth adapter change
+        // Check bluetooth adapter and update your UI accordingly.
+        boolean isBluetoothOn = BluetoothAdapter.getDefaultAdapter().isEnabled();
+        Log.i(TAG, "Bluetooth State Changed: " + isBluetoothOn);
     }
 
     @Override
