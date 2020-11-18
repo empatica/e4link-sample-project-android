@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '29.0.3'
+    compileSdkVersion 30
+    buildToolsVersion '30.0.2'
     defaultConfig {
         applicationId 'com.empatica.empalinksample'
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode 2323
-        versionName "1.1"
+        versionName "1.2"
     }
     buildTypes {
         release {
@@ -19,8 +19,8 @@ android {
     productFlavors {
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_6
-        targetCompatibility JavaVersion.VERSION_1_6
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -54,7 +54,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.empatica.empalink:E4link:1.0.0@aar'
     implementation 'com.squareup.okhttp:okhttp:2.7.5'
 }
