@@ -1,4 +1,4 @@
-# E4link 1.0 Sample Project
+# E4link Sample Project
 
 ## Introduction
 
