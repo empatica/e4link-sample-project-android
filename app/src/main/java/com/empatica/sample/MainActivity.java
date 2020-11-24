@@ -2,27 +2,27 @@ package com.empatica.sample;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
+import android.bluetooth.le.ScanCallback;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.empatica.empalink.ConnectionNotAllowedException;
 import com.empatica.empalink.EmpaDeviceManager;
@@ -35,6 +35,8 @@ import com.empatica.empalink.delegate.EmpaStatusDelegate;
 
 
 public class MainActivity extends AppCompatActivity implements EmpaDataDelegate, EmpaStatusDelegate {
+
+    private static final String TAG = "MainActivity";
 
     private static final int REQUEST_ENABLE_BT = 1;
 
@@ -160,8 +162,8 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
 
     private void initEmpaticaDeviceManager() {
         // Android 6 (API level 23) now require ACCESS_COARSE_LOCATION permission to use BLE
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_COARSE_LOCATION }, REQUEST_PERMISSION_ACCESS_COARSE_LOCATION);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, REQUEST_PERMISSION_ACCESS_COARSE_LOCATION);
         } else {
 
             if (TextUtils.isEmpty(EMPATICA_API_KEY)) {
@@ -189,9 +191,6 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
     @Override
     protected void onPause() {
         super.onPause();
-        if (deviceManager != null) {
-            deviceManager.stopScanning();
-        }
     }
 
     @Override
@@ -203,10 +202,21 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        if (deviceManager != null) {
+            deviceManager.stopScanning();
+        }
+    }
+
+    @Override
     public void didDiscoverDevice(EmpaticaDevice bluetoothDevice, String deviceName, int rssi, boolean allowed) {
         // Check if the discovered device can be used with your API key. If allowed is always false,
         // the device is not linked with your API key. Please check your developer area at
         // https://www.empatica.com/connect/developer.php
+
+        Log.i(TAG, "didDiscoverDevice" + deviceName + "allowed: " + allowed);
+
         if (allowed) {
             // Stop scanning. The first allowed device will do.
             deviceManager.stopScanning();
@@ -217,13 +227,35 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
             } catch (ConnectionNotAllowedException e) {
                 // This should happen only if you try to connect when allowed == false.
                 Toast.makeText(MainActivity.this, "Sorry, you can't connect to this device", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "didDiscoverDevice" + deviceName + "allowed: " + allowed + " - ConnectionNotAllowedException", e);
             }
         }
     }
 
     @Override
     public void didFailedScanning(int errorCode) {
-
+        
+        /*
+         A system error occurred while scanning.
+         @see https://developer.android.com/reference/android/bluetooth/le/ScanCallback
+        */
+        switch (errorCode) {
+            case ScanCallback.SCAN_FAILED_ALREADY_STARTED:
+                Log.e(TAG,"Scan failed: a BLE scan with the same settings is already started by the app");
+                break;
+            case ScanCallback.SCAN_FAILED_APPLICATION_REGISTRATION_FAILED:
+                Log.e(TAG,"Scan failed: app cannot be registered");
+                break;
+            case ScanCallback.SCAN_FAILED_FEATURE_UNSUPPORTED:
+                Log.e(TAG,"Scan failed: power optimized scan feature is not supported");
+                break;
+            case ScanCallback.SCAN_FAILED_INTERNAL_ERROR:
+                Log.e(TAG,"Scan failed: internal error");
+                break;
+            default:
+                Log.e(TAG,"Scan failed with unknown error (errorCode=" + errorCode + ")");
+                break;
+        }
     }
 
     @Override
@@ -235,7 +267,10 @@ public class MainActivity extends AppCompatActivity implements EmpaDataDelegate,
 
     @Override
     public void bluetoothStateChanged() {
-
+        // E4link detected a bluetooth adapter change
+        // Check bluetooth adapter and update your UI accordingly.
+        boolean isBluetoothOn = BluetoothAdapter.getDefaultAdapter().isEnabled();
+        Log.i(TAG, "Bluetooth State Changed: " + isBluetoothOn);
     }
 
     @Override
